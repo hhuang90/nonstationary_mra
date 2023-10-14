@@ -1,0 +1,145 @@
+## Comment lines begin with a "#".
+
+# Name with the path for the data file. It should be a binary file. The first number is the number of observations n that is stored as an unsigned 64-bit integer. Following are n longitudes, n latitudes, and n observation values, each element of which is stored as a 64-bit real number. If VARIOUS_J_FINEST_LEVEL_FLAG is "true", n regions indices for observations are followed, stored as unsigned 64-bit integers.
+    DATA_FILE_NAME=data/minimal_reproducible_example/dataLonLat.bin
+
+# The flag for whether to eliminate duplicates in the raw data. If it is guaranteed that there are no duplicates in the raw data, set the flag to "false" to save computation time. Must be either "true" or "false".
+	ELIMINATION_DUPLICATES_FLAG=false
+
+# The flag for whether to perform linear regression with respect to longitudes, latitudes, and an intercept. in the raw data.Must be either "true" or "false".
+	REGRESSION_FLAG=false
+
+# The flag for whether to use nonstationary covariance model
+	NONSTATIONARY_FLAG=true
+
+# The ratio of the smallest distance between any knot and the region boundary to the length of the region in each dimension. Requires a numerical value or "default" to use the default value exp/100.
+	OFFSET=default
+
+# The number of subregions in each partitioning. Requires to be either 2 or 4.
+	NUM_PARTITIONS_J=2
+
+# The number of knots in each region before the finest resolution level. The number of knots at the finest resolution level is automatically determined by the data and the built structure, and the number can be different in different regions at the finest resolution level.
+	NUM_KNOTS_r=4
+
+# The number of levels. Requires a positive integer or "default" to use the number that is automatically determined from NUM_PARTITIONS_J and NUM_KNOTS_r by making the average number of observations per region at the finest resolution level similar to the number of knots in regions before the finest resolution level.
+	NUM_LEVELS_M=5
+
+# The flag for whether to print more details of the setup, the loaded data and the built structure. Must be either "true" or "false".
+	PRINT_DETAIL_FLAG=true
+
+# The type of calculations. Must be one of "prediction", "optimization", "likelihood", "build_structure_only". If the value is "build_structure_only", only the hierarchical structure is built, and an output file "structure_information.txt" will be generated to show the details of the built structure. For "prediction", only prediction locations with coordinates between the minimal and maximal data coordinates are considered.
+	CALCULATION_MODE=prediction
+
+# The way of specifying the prediction locations. Must be one of 'D' for all the locations in DATA_FILE_NAME no matter whether the associated observation is a valid value or NaN, 'N' for locations in DATA_FILE_NAME that only have NaN values, 'A' for locations specified in PREDICTION_LOCATION_FILE.
+    PREDICTION_LOCATION_MODE=A
+
+# Name for the prediction location file. Only used when PREDICTION_LOCATION_MODE='A'. It should be a binary file. The first number is the number of observations np that is stored as an unsigned 64-bit integer. Following are np longitudes and np latitudes, each element of which is stored as a 64-bit real number. If VARIOUS_J_FINEST_LEVEL_FLAG is "true", np regions indices for predictions are followed, stored as unsigned 64-bit integers.
+    PREDICTION_LOCATION_FILE=data/minimal_reproducible_example/testLonLat.bin
+
+# The flag for whether to dump prediction results to an output file specified by PREDICTION_RESULTS_FILE_NAME.  Must be either "true" or "false".
+	DUMP_PREDICTION_RESULTS_FLAG=true
+
+# The output file for storing prediction results. Only used when DUMP_PREDICTION_RESULTS_FLAG="true" and CALCULATION_MODE="predict". Multiple files will be generated to save the prediction results if more than one MPI process is used. Each file will save the prediction results in the following way: the first number is the number of predictions by this MPI process nr stored as an unsigned 64-bit integer, and following are nr longitudes, nr latitudes, nr prediction means, and nr prediction variances, as 64-bit real numbers.
+	PREDICTION_RESULTS_FILE_NAME=data/pred_res_varJ.bin
+
+# The flag for whether to save temporary files to disk. Must be either "true" or "false".
+	SAVE_TO_DISK_FLAG=false
+
+# The directory for saving the temporary files on disk. Make sure the specified directory exists. Only used when "SAVE_TO_DISK"="true".
+	TMP_DIRECTORY=
+
+# The flag for whether to use the dynamic scheduling of workload for each worker. Must be either "true" or "false".
+	DYNAMIC_SCHEDULE_FLAG=true
+
+#######################################################
+### Setup used for stationary covariance model only ###
+#######################################################
+
+# Sill parameter in the covariance function. Requires to be a positive numerical value. Will be ignored if CALCULATION_MODE="optimization" where the optimal values that maximizes the likelihood will be found.
+	SIGMASQ=5.57
+
+# Range parameter in the covariance function. Requires to be a positive numerical value. Will be ignored if CALCULATION_MODE="optimization" where the optimal values that maximizes the likelihood will be found.
+	BETA=100
+
+# Nugget parameter in the covariance function. Requires to be a positive numerical value. Will be ignored if CALCULATION_MODE="optimization" where the optimal values that maximizes the likelihood will be found.
+	TAUSQ=0.001
+
+# Maximum number of iterations allowed in the optimization. Only used when CALCULATION_MODE="optimization".
+	MAX_ITERATIONS=1000
+
+# Initial guess of sill parameter in the covariance function in optimization. Only used when CALCULATION_MODE="optimization".
+	SIGMASQ_INITIAL_GUESS=1
+
+# Lower bound for sill parameter in the covariance function in optimization. Only used when CALCULATION_MODE="optimization".
+	SIGMASQ_LOWER_BOUND=0.01
+
+# Upper bound for sill parameter in the covariance function in optimization. Only used when CALCULATION_MODE="optimization".
+	SIGMASQ_UPPER_BOUND=10
+
+# Initial guess of range parameter in the covariance function in optimization. Only used when CALCULATION_MODE="optimization".
+	BETA_INITIAL_GUESS=0.1
+
+# Lower bound for range parameter in the covariance function in optimization. Only used when CALCULATION_MODE="optimization".
+	BETA_LOWER_BOUND=0.01
+
+# Upper bound for range parameter in the covariance function in optimization. Only used when CALCULATION_MODE="optimization".
+	BETA_UPPER_BOUND=1
+
+# Initial guess of nugget parameter in the covariance function in optimization. Only used when CALCULATION_MODE="optimization".
+	TAUSQ_INITIAL_GUESS=0.05
+
+# Lower bound for nugget parameter in the covariance function in optimization. Only used when CALCULATION_MODE="optimization".
+	TAUSQ_LOWER_BOUND=0.00
+
+# Upper bound for nugget parameter in the covariance function in optimization. Only used when CALCULATION_MODE="optimization".
+	TAUSQ_UPPER_BOUND=1
+
+##########################################################
+### Setup used for nonstationary covariance model only ###
+##########################################################
+
+# Nonstarionary sill parameter file. It should be a binary file. The first number is the number of basis functions n_sill that is stored as an unsigned 64-bit integer. The second number is the intercept as a 64-bit real number. Following are n_sill longitudes, n_sill latitudes, and n_sill weights for each basis function, each element of which is stored as a 64-bit real number. The formula is log(sigmasq) = intercept + basis_1 + ... + basis_{n_sill}
+	SIGMASQ_FILE_NAME=data/minimal_reproducible_example/log_sill_chordal.bin
+
+# Nonstarionary range parameter file. It should be a binary file. The first number is the number of basis functions n_range that is stored as an unsigned 64-bit integer. The second number is the intercept as a 64-bit real number. Following are n_range longitudes, n_range latitudes, and n_range weights for each basis function, each element of which is stored as a 64-bit real number. The formula is log(beta) = intercept + basis_1 + ... + basis_{n_range}
+	BETA_FILE_NAME=data/minimal_reproducible_example/log_range_chordal.bin
+
+# Nonstarionary nugget parameter file. It should be a binary file. The first number is the number of basis functions n_nugget that is stored as an unsigned 64-bit integer. The second number is the intercept as a 64-bit real number. Following are n_nugget longitudes, n_nugget latitudes, and n_nugget weights for each basis function, each element of which is stored as a 64-bit real number. The formula is log(tausq) = intercept + basis_1 + ... + basis_{n_nugget}
+	TAUSQ_FILE_NAME=data/minimal_reproducible_example/log_nugget_chordal.bin
+
+# Sill multiplicative factor in the nonstatioanry covariance function. Requires to be a positive numerical value. Will be ignored if CALCULATION_MODE="optimization" where the optimal values that maximizes the likelihood will be found.
+	SIGMASQ_SCALE=0.999456
+
+# Range multiplicative factor in the covariance function. Requires to be a positive numerical value. Will be ignored if CALCULATION_MODE="optimization" where the optimal values that maximizes the likelihood will be found.
+	BETA_SCALE=0.674449
+
+# Nugget multiplicative factor in the covariance function. Requires to be a positive numerical value. Will be ignored if CALCULATION_MODE="optimization" where the optimal values that maximizes the likelihood will be found.
+	TAUSQ_SCALE = 1.27219
+
+#### Update
+
+# The flag for whether to use chordal distance
+	CHORDAL_DISTANCE_FLAG=true
+
+# The flag for whether to place knots by provided files. If PROVIDED_KNOTS_FLAG is "true", then VARIOUS_J_FINEST_LEVEL_FLAG must be "true" and PARENT_REGION_FILE_NAME must be subsequently provided.
+	PROVIDED_KNOTS_FLAG=true
+
+	# The file name for the provided knots. The first number is the total number of knots nr that is stored as an unsigned 64-bit integer. Following are nr longitudes, nr latitudes, 
+	###x(=cos(lat)*cos(lon)), nr y(=cos(lat)*sin(lon)), nr z(=sin(lat)) coordinates ###
+	# and nr region indices, each element of which is stored as a 64-bit real number. Only be used if PROVIDED_KNOTS_FLAG is "true".
+		KNOTS_FILE_NAME=data/minimal_reproducible_example/knots.bin
+
+	# The flag for whether to use the observation locations as knots at the finest level. If "false", the knots at the finest level must be provided in KNOTS_FILE_NAME. Must be true. TO BE DELETED
+		OBS_AS_KNOTS_FLAG = true
+
+	# The number of knots in each region at the finest resolution level. Only used when OBS_AS_KNOTS_FLAG is "false". TO BE DELETED
+		NUM_KNOTS_FINEST = 3
+
+#The flag for whether to have various number of regions in the finest level. If VARIOUS_J_FINEST_LEVEL_FLAG is "true", then PROVIDED_KNOTS_FLAG must be "true"
+	 VARIOUS_J_FINEST_LEVEL_FLAG = true
+
+# The file for the parent region indices of the regions in the finest level. The first (region_min) and second (region_max) number is the minimum and maximum region indices in the finest level, stored as a 64-bit real number. Then (region_max - region_min + 1) parent region indices of the regions in the finest level are followed, stored as unsigned 64-bit integers. Only be used and must be provided if PROVIDED_KNOTS_FLAG is "true".
+PARENT_REGION_FILE_NAME=data/minimal_reproducible_example/parentOfRegionsInFinestLevel.bin
+
+# Length of Wendland basis function support. Only used when NONSTATIONARY_FLAG=true
+	WENDLAND_LEN = 0.22
